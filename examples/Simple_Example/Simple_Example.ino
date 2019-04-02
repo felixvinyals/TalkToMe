@@ -3,6 +3,7 @@
 TalkToMe ttm;
 
 void setup() {
+  Serial.begin(9600);
   ttm.begin();
   Serial.println("Begin!");
 }

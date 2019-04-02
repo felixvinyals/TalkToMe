@@ -9,11 +9,10 @@ TalkToMe::TalkToMe(){
 }
 
 void TalkToMe::begin() {
-	Serial.begin(9600);
 }
 
 void TalkToMe::checkSerialForCommands(byte* _type, String* _parameter, String* _value) {
-	
+	Serial.flush();
 	findEndOfCommand();
 	*_type = type;
 	*_parameter = parameter;
@@ -25,17 +24,13 @@ void TalkToMe::checkSerialForCommands(byte* _type, String* _parameter, String* _
 
 void TalkToMe::findEndOfCommand() {
   // Keeps storing chars in the array until ETX or CrLf is detected
-  // Serial buffer size: 64
-  // Returns:
-  
-  
+
   byte index; // An index to move in the loops
   byte charactersOnRecivingBuffer = 0; // How many characters (bytes) do we have in the reciving buffer
   char serialRecivedCharacter = 0; // Where we store what we read from the buffer
   
-
   charactersOnRecivingBuffer = Serial.available();
-
+  Serial.println("Serial.available(): " + String(charactersOnRecivingBuffer));
   if (charactersOnRecivingBuffer > 0) { // There is something in the buffer
     for (index = 0; index < charactersOnRecivingBuffer; index++) { // Let's check all what we've recived
       serialRecivedCharacter = Serial.read(); // Get a character from the buffer
@@ -43,9 +38,7 @@ void TalkToMe::findEndOfCommand() {
       
       if (bytesRecived >= serialReciveBufferSize) { // Buffer overflow error
         Serial.println("Buffer overflow");
-        
         clearSerialRecivingBuffer();
-        // return(1);
       }
       
       if (serialRecivedCharacter == -1) { // The buffer is empty
@@ -61,17 +54,11 @@ void TalkToMe::findEndOfCommand() {
       
       // End of command is CrLf
       else if ((serialRecivedCharacter == 10) && (lastCharIsCR == true)) {
-        Serial.println("Valid recived command CrLf");
-        //printSerialRecivingBuffer();
-		
 		analyzeCommand();
 		clearSerialRecivingBuffer();
       }
       // End of command is ETX
       else if ((serialRecivedCharacter == 3) && (recivedSTX == true)) {
-        Serial.println("Valid recived command ETX");
-        //printSerialRecivingBuffer();
-		
 		analyzeCommand();
 		clearSerialRecivingBuffer();
       }
@@ -97,12 +84,10 @@ void TalkToMe::analyzeCommand() {
 	
     if (serialRecivingBufferArray[index] != 0) {
 		if (serialRecivingBufferArray[index] == '?') { // Get parameter command
-			Serial.println("Question command");
 			serialRecivingBufferArray[index] = 0;
 			type = 1;
 			parameter = String(serialRecivingBufferArray);
 			value = "";
-			Serial.println("Get Parameter");
 			break;
 		}
 		else if (serialRecivingBufferArray[index] == '=') { // Set parameter command
@@ -110,13 +95,12 @@ void TalkToMe::analyzeCommand() {
 			type = 2;
 			parameter = String(serialRecivingBufferArray).substring(0, equalCharPosition);
 			value = String(serialRecivingBufferArray).substring(equalCharPosition + 1, bytesRecived);
-			Serial.println("Set Parameter");
 			break;
 		}
     }
   }
   if (index == 0) {
-	  type = 255;
+	  type = 255; // 255 is the invalid command format id
   }
 }
 

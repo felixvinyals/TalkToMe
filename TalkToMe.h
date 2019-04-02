@@ -33,13 +33,6 @@
 
 class TalkToMe {
 	public:
-		// Variables:
-		/* struct ttmCommandStruct {
-			byte commandType;	
-			String commandParameter;
-			String commandValue;
-		}; */
-		
 		// Constructor:
 		TalkToMe();
 		
@@ -54,14 +47,14 @@ class TalkToMe {
 		boolean recivedSTX; // If the first char recived was a STX
 		byte bytesRecived; // Total recived bytes before end CrLF or ETX
 		
-		String parameter, value;
+		String parameter, value; // Where we sotre the clean data of the parameter and value
 		byte type; // 255: command not recognized 0: no new data 1: Get parameter 2: Set parameter
 		
 		// Functions:
-		void findEndOfCommand();
-		void analyzeCommand();
-		void clearSerialRecivingBuffer();
-		void printSerialRecivingBuffer();
+		void findEndOfCommand(); // Find the end of the command characters
+		void analyzeCommand(); // Analyse the command found
+		void clearSerialRecivingBuffer(); // Clear reciving buffer
+		void printSerialRecivingBuffer(); // Printout the reciving buffer
 	
 };
 
